@@ -26,6 +26,7 @@ nbdist/
 # front end ignore files
 # dependencies
 /node_modules
+/node
 
 # testing
 /coverage

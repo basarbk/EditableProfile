@@ -1,55 +1,69 @@
 package com.basarbk.editableprofile;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.assertj.core.api.Assertions.assertThat;
 
-import java.io.IOException;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Map;
 import java.util.stream.IntStream;
 
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
+import org.springframework.boot.test.web.client.TestRestTemplate;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.http.client.support.BasicAuthorizationInterceptor;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
-import org.springframework.test.web.servlet.MockMvc;
 
+import com.basarbk.editableprofile.configuration.DataUtil;
 import com.basarbk.editableprofile.domain.Profile;
-import com.basarbk.editableprofile.rest.ProfileController;
+import com.basarbk.editableprofile.domain.vm.ValidationError;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 @RunWith(SpringRunner.class)
-@WebMvcTest(ProfileController.class)
+@SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
+@ActiveProfiles("test")
 public class ProfileControllerTest {
 	
-    @Autowired
-    private MockMvc mvc;
+	@Autowired
+	private TestRestTemplate testRestTemplate;
     
     private String long257chars = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in ";
 	
+    @Before
+    public void setup() {
+        BasicAuthorizationInterceptor basicAuth = new BasicAuthorizationInterceptor("testuser1", "testpassword");
+        testRestTemplate.getRestTemplate().getInterceptors().add(basicAuth);
+    }
+    
 	@Test
 	public void validationFailureEmptyObject() throws Exception {
 		Profile profile = new Profile();
-		mvc
-		.perform(post("/api/profile").contentType(MediaType.APPLICATION_JSON_UTF8).content(json(profile)))
-		.andExpect(status().isBadRequest());
+		ResponseEntity<ValidationError> error = testRestTemplate.postForEntity("/api/profiles", profile, ValidationError.class);
+		assertThat(error.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
 	}
 	
 	@Test
 	public void validationFailuresForNullFields() throws Exception {
 		Profile profile = new Profile();
-		mvc
-		.perform(post("/api/profile").contentType(MediaType.APPLICATION_JSON_UTF8).content(json(profile)))
-		.andExpect(status().isBadRequest())
-		.andExpect(jsonPath("$.errors.displayName").exists())
-		.andExpect(jsonPath("$.errors.realName").exists())
-		.andExpect(jsonPath("$.errors.birthday").exists())
-		.andExpect(jsonPath("$.errors.gender").exists())
-		.andExpect(jsonPath("$.errors.marialStatus").exists())
-		.andExpect(jsonPath("$.errors.location").exists());		
+		ResponseEntity<ValidationError> error = testRestTemplate.postForEntity("/api/profiles", profile, ValidationError.class);
+		Map<String, String> errorMap = error.getBody().getErrors();
+		assertThat(error.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+		assertThat(errorMap.containsKey("displayName")).isTrue();
+		assertThat(errorMap.containsKey("realName")).isTrue();
+		assertThat(errorMap.containsKey("birthday")).isTrue();
+		assertThat(errorMap.containsKey("gender")).isTrue();
+		assertThat(errorMap.containsKey("maritalStatus")).isTrue();
+		assertThat(errorMap.containsKey("location")).isTrue();	
 	}
 	
 	@Test
@@ -62,13 +76,14 @@ public class ProfileControllerTest {
 		StringBuilder longerThan5000chars = new StringBuilder();
 		IntStream.rangeClosed(1, 20).forEach(i -> longerThan5000chars.append(long257chars));
 		profile.setAboutMe(longerThan5000chars.toString());
-		mvc
-		.perform(post("/api/profile").contentType(MediaType.APPLICATION_JSON_UTF8).content(json(profile)))
-		.andExpect(status().isBadRequest())
-		.andExpect(jsonPath("$.errors.displayName").exists())
-		.andExpect(jsonPath("$.errors.realName").exists())
-		.andExpect(jsonPath("$.errors.occupation").exists())
-		.andExpect(jsonPath("$.errors.aboutMe").exists());
+		
+		ResponseEntity<ValidationError> error = testRestTemplate.postForEntity("/api/profiles", profile, ValidationError.class);
+		Map<String, String> errorMap = error.getBody().getErrors();
+		assertThat(error.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+		assertThat(errorMap.containsKey("displayName")).isTrue();
+		assertThat(errorMap.containsKey("realName")).isTrue();
+		assertThat(errorMap.containsKey("occupation")).isTrue();
+		assertThat(errorMap.containsKey("aboutMe")).isTrue();	
 
 	}
 	
@@ -78,25 +93,127 @@ public class ProfileControllerTest {
 		Calendar c = Calendar.getInstance();
 		c.set(2100, 1,1);
 		profile.setBirthday(new Date(c.getTimeInMillis()));
-		mvc
-		.perform(post("/api/profile").contentType(MediaType.APPLICATION_JSON_UTF8).content(json(profile)))
-		.andExpect(status().isBadRequest())
-		.andExpect(jsonPath("$.errors.birthday").exists());
+		
+		ResponseEntity<ValidationError> error = testRestTemplate.postForEntity("/api/profiles", profile, ValidationError.class);
+		Map<String, String> errorMap = error.getBody().getErrors();
+		assertThat(error.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+		assertThat(errorMap.containsKey("birthday")).isTrue();
 	}
 	
 	@Test
-	public void validationFailForLongDisplayName() throws Exception {
-		Profile profile = new Profile();
-		profile.setDisplayName(long257chars);
-		mvc
-		.perform(post("/api/profile").contentType(MediaType.APPLICATION_JSON_UTF8).content(json(profile)))
-		.andExpect(status().isBadRequest())
-		.andExpect(jsonPath("$.errors.displayName").exists());
+	public void getProfiles() throws Exception {
+		ResponseEntity<Object[]> profileList = testRestTemplate.getForEntity("/api/profiles", Object[].class);
+		assertThat(profileList.getStatusCode()).isEqualTo(HttpStatus.OK);
+		assertThat(profileList.getBody().length).isEqualTo(2);
 	}
 	
-    protected String json(Object o) throws IOException {
-    	ObjectMapper mapper = new ObjectMapper();
-    	return mapper.writeValueAsString(o);
-    }
+	@Test
+	public void getOthersProfilePublicData() throws Exception {
+		ResponseEntity<Profile> profileResponse = testRestTemplate.getForEntity("/api/profiles/2", Profile.class);
+		assertThat(profileResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
+		
+		Profile profile = profileResponse.getBody();
+		assertThat(profile.getRealName()).isNull();
+		assertThat(profile.getMaritalStatus()).isNull();
+		assertThat(profile.getOccupation()).isNull();
+	}
+	
+	@Test
+	public void getMyProfileOwnerData() throws Exception {
+		ResponseEntity<Profile> profileResponse = testRestTemplate.getForEntity("/api/profiles/1", Profile.class);
+		assertThat(profileResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
+		
+		Profile profile = profileResponse.getBody();
+		assertThat(profile.getRealName()).isNotNull();
+		assertThat(profile.getMaritalStatus()).isNotNull();
+		assertThat(profile.getOccupation()).isNotNull();
+	}
+	
+	@Test
+	public void getUnknownProfile() throws Exception {
+		ResponseEntity<Object> unknownProfileResponse = testRestTemplate.getForEntity("/api/profiles/1000", Object.class);
+		assertThat(unknownProfileResponse.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
+		
+		ObjectMapper mapper = new ObjectMapper();
+		String json = mapper.writeValueAsString(unknownProfileResponse.getBody());
+		assertThat(json.contains("Profile Not Found")).isTrue();
+	}
+	
+	@Test
+	public void updateProfileAuthFail() throws Exception {
+		Profile profile = DataUtil.getRandomProfile();
+		ResponseEntity<Profile> selfProfileResponse = testRestTemplate.getForEntity("/api/profiles/self", Profile.class);
+		assertThat(selfProfileResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
+		Profile remote = selfProfileResponse.getBody();
+		profile.setId(remote.getId());
+		
+		testRestTemplate.getRestTemplate().getInterceptors().clear();
+		
+		ObjectMapper mapper = new ObjectMapper();
+		String json = mapper.writeValueAsString(profile);
+		HttpHeaders headers = new HttpHeaders();
+	    headers.setContentType(MediaType.APPLICATION_JSON); 
+		HttpEntity<String> entity = new HttpEntity<String>(json, headers); 
+		ResponseEntity<Object> error = testRestTemplate.exchange("/api/profiles/"+profile.getId(), HttpMethod.PUT, entity, Object.class);
+		assertThat(error.getStatusCode()).isEqualTo(HttpStatus.FORBIDDEN);
+	}
+
+	@Test
+	public void updateProfileAuthFail2() throws Exception {
+		Profile profile = DataUtil.getRandomProfile();
+		ResponseEntity<Profile> selfProfileResponse = testRestTemplate.getForEntity("/api/profiles/self", Profile.class);
+		assertThat(selfProfileResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
+		Profile remote = selfProfileResponse.getBody();
+		profile.setId(remote.getId());
+		
+		ObjectMapper mapper = new ObjectMapper();
+		String json = mapper.writeValueAsString(profile);
+		HttpHeaders headers = new HttpHeaders();
+	    headers.setContentType(MediaType.APPLICATION_JSON); 
+		HttpEntity<String> entity = new HttpEntity<String>(json, headers); 
+		ResponseEntity<Object> error = testRestTemplate.exchange("/api/profiles/10000", HttpMethod.PUT, entity, Object.class);
+		assertThat(error.getStatusCode()).isEqualTo(HttpStatus.FORBIDDEN);
+	}
+	
+	@Test
+	public void updateProfileValidationFail() throws Exception {
+		Profile profile = new Profile();
+		ResponseEntity<Profile> selfProfileResponse = testRestTemplate.getForEntity("/api/profiles/self", Profile.class);
+		assertThat(selfProfileResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
+		Profile remote = selfProfileResponse.getBody();
+		profile.setId(remote.getId());
+		
+		ObjectMapper mapper = new ObjectMapper();
+		String json = mapper.writeValueAsString(profile);
+		HttpHeaders headers = new HttpHeaders();
+	    headers.setContentType(MediaType.APPLICATION_JSON); 
+		HttpEntity<String> entity = new HttpEntity<String>(json, headers); 
+		ResponseEntity<ValidationError> error = testRestTemplate.exchange("/api/profiles/"+profile.getId(), HttpMethod.PUT, entity, ValidationError.class);
+		assertThat(error.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+		Map<String, String> errorMap = error.getBody().getErrors();
+		assertThat(errorMap.containsKey("displayName")).isTrue();
+		assertThat(errorMap.containsKey("realName")).isTrue();
+		assertThat(errorMap.containsKey("birthday")).isTrue();
+		assertThat(errorMap.containsKey("gender")).isTrue();
+		assertThat(errorMap.containsKey("maritalStatus")).isTrue();
+		assertThat(errorMap.containsKey("location")).isTrue();	
+	}
+	
+	@Test
+	public void updateProfileSuccess() throws Exception {
+		Profile profile = DataUtil.getRandomProfile();
+		ResponseEntity<Profile> selfProfileResponse = testRestTemplate.getForEntity("/api/profiles/self", Profile.class);
+		assertThat(selfProfileResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
+		Profile remote = selfProfileResponse.getBody();
+		profile.setId(remote.getId());
+		
+		ObjectMapper mapper = new ObjectMapper();
+		String json = mapper.writeValueAsString(profile);
+		HttpHeaders headers = new HttpHeaders();
+	    headers.setContentType(MediaType.APPLICATION_JSON); 
+		HttpEntity<String> entity = new HttpEntity<String>(json, headers); 
+		ResponseEntity<Object> response = testRestTemplate.exchange("/api/profiles/"+profile.getId(), HttpMethod.PUT, entity, Object.class);
+		assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+	}
 
 }

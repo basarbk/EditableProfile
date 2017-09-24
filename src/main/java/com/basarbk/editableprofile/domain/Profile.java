@@ -3,7 +3,9 @@ package com.basarbk.editableprofile.domain;
 import java.io.Serializable;
 import java.util.Date;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.OneToOne;
 import javax.persistence.Temporal;
@@ -15,55 +17,70 @@ import javax.validation.constraints.Size;
 
 import org.springframework.web.multipart.MultipartFile;
 
+import com.basarbk.editableprofile.domain.vm.View;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonView;
+
 @Entity
 public class Profile implements Serializable{
 
-	@Id
+	@Id @GeneratedValue
 	private long id;
 
 	@NotNull(message = "{error.field.required}")
 	@Size(max=256, message="{error.field.size.limit}")
+	@JsonView(View.Public.class)
 	private String displayName;
 	
 	@NotNull(message = "{error.field.required}")
 	@Size(max=256, message="{error.field.size.limit}")
+	@JsonView(View.Owner.class)
 	private String realName;
 	
+	@JsonView(View.Public.class)
 	private String profilePicture;
 	
 	@Temporal(TemporalType.DATE)
 	@Past(message = "{error.field.birthday.past}")
 	@NotNull(message = "{error.field.required}")
+	@JsonView(View.Public.class)
 	private Date birthday;
 	
 	@NotNull(message = "{error.field.required}")
+	@JsonView(View.Public.class)
 	private String gender;
 	
+	@JsonView(View.Public.class)
 	private String ethnicity;
 	
+	@JsonView(View.Public.class)
 	private String religion;
 	
+	@JsonView(View.Public.class)
 	private int height;
 	
+	@JsonView(View.Public.class)
 	private String figure;
 	
 	@NotNull(message = "{error.field.required}")
-	private String marialStatus;
+	@JsonView(View.Owner.class)
+	private String maritalStatus;
 	
 	@Size(max=256, message="{error.field.size.limit}")
+	@JsonView(View.Owner.class)
 	private String occupation;
 	
 	@Size(max=5000, message="{error.field.size.limit}")
+	@JsonView(View.Public.class)
 	private String aboutMe;
 	
 	@NotNull(message = "{error.field.required}")
-	@OneToOne(mappedBy="profile")
+	@OneToOne(mappedBy="profile", cascade=CascadeType.ALL)
+	@JsonView(View.Public.class)
 	private Location location;
 	
-	@OneToOne(mappedBy="profile")
-	private User user;
-	
 	@Transient
+	@JsonIgnore
 	private MultipartFile profilePictureFile;
 	
 	
@@ -151,12 +168,12 @@ public class Profile implements Serializable{
 		this.figure = figure;
 	}
 
-	public String getMarialStatus() {
-		return marialStatus;
+	public String getMaritalStatus() {
+		return maritalStatus;
 	}
 
-	public void setMarialStatus(String marialStatus) {
-		this.marialStatus = marialStatus;
+	public void setMaritalStatus(String maritalStatus) {
+		this.maritalStatus = maritalStatus;
 	}
 
 	public String getOccupation() {
@@ -189,14 +206,6 @@ public class Profile implements Serializable{
 
 	public void setProfilePictureFile(MultipartFile profilePictureFile) {
 		this.profilePictureFile = profilePictureFile;
-	}
-
-	public User getUser() {
-		return user;
-	}
-
-	public void setUser(User user) {
-		this.user = user;
 	}
 
 	private static final long serialVersionUID = -5758197211026168135L;

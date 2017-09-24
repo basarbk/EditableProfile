@@ -5,36 +5,24 @@ import java.io.Serializable;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
-import javax.persistence.OneToOne;
-
-import com.basarbk.editableprofile.domain.vm.View;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonView;
 
 @Entity
-public class Location implements Serializable {
-	
+public class GlobalLocations implements Serializable {
+
 	@Id @GeneratedValue
 	private long id;
-	
-	@JsonView(View.Public.class)
+
 	private String lat;
 	
-	@JsonView(View.Public.class)
 	private String lon;
 	
-	@JsonView(View.Public.class)
 	private String city;
 	
-	@OneToOne
-	@JsonIgnore
-	private Profile profile;
-
-	public Location() {
+	public GlobalLocations() {
 		super();
 	}
 
-	public Location(String lat, String lon, String city) {
+	public GlobalLocations(String lat, String lon, String city) {
 		super();
 		this.lat = lat;
 		this.lon = lon;
@@ -72,14 +60,12 @@ public class Location implements Serializable {
 	public void setCity(String city) {
 		this.city = city;
 	}
-
-	public Profile getProfile() {
-		return profile;
-	}
-
-	public void setProfile(Profile profile) {
-		this.profile = profile;
-	}
 	
-	private static final long serialVersionUID = 4391985523873663024L;
+	private static final long serialVersionUID = 7960328662777664476L;
+
+	@Override
+	public String toString() {
+		return "GlobalLocations [lat=" + lat + ", lon=" + lon + ", city=" + city + "]";
+	}
+
 }

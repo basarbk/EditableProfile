@@ -39,8 +39,8 @@ public class ProfileService {
 			String path = photoService.savePhoto(profile.getProfilePictureFile());
 			profile.setProfilePicture(path);
 		}
-		
 		profile.setId(id);
+		profile.getLocation().setProfile(profile);
 		profileDao.save(profile);
 		return profile;
 	}

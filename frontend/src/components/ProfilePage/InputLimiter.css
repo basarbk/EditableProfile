@@ -1,0 +1,12 @@
+
+.limit-normal{
+    color: black;
+}
+
+.limit-warning{
+    color: orange;
+}
+
+.limit-alert{
+    color:red;
+}

@@ -79,7 +79,7 @@ module.exports = function(proxy, allowedHost) {
     public: allowedHost,
     proxy: [
       {
-        context: ['/api/**'],
+        context: ['/**'],
         target: 'http://localhost:8080',
         changeOrigin: true
       }

@@ -15,12 +15,12 @@ import org.springframework.test.context.junit4.SpringRunner;
 import com.basarbk.editableprofile.domain.GlobalLocations;
 import com.basarbk.editableprofile.domain.dao.GlobalLocationsDao;
 import com.basarbk.editableprofile.exception.LocationNotFoundException;
-import com.basarbk.editableprofile.service.LocationService;
+import com.basarbk.editableprofile.service.GlobalLocationService;
 
 @RunWith(SpringRunner.class)
 public class LocationServiceTest {
 	
-	LocationService locationService;
+	GlobalLocationService locationService;
     
 	@MockBean
     private GlobalLocationsDao locationDao;
@@ -32,7 +32,7 @@ public class LocationServiceTest {
 	@Before
     public void setup(){
     	
-		locationService = new LocationService(locationDao);
+		locationService = new GlobalLocationService(locationDao);
 		List<GlobalLocations> bas = Arrays.asList(basel, basra);
     	Mockito.when(locationDao.findByCityStartingWithIgnoreCase("bas")).thenReturn(bas);
     	Mockito.when(locationDao.findByCityStartingWithIgnoreCase("base")).thenReturn(Arrays.asList(basel));

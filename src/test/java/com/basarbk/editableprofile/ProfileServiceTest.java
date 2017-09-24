@@ -16,6 +16,7 @@ import com.basarbk.editableprofile.configuration.DataUtil;
 import com.basarbk.editableprofile.domain.Profile;
 import com.basarbk.editableprofile.domain.dao.ProfileDao;
 import com.basarbk.editableprofile.exception.ProfileNotFoundException;
+import com.basarbk.editableprofile.service.LocationService;
 import com.basarbk.editableprofile.service.PhotoService;
 import com.basarbk.editableprofile.service.ProfileService;
 
@@ -30,6 +31,9 @@ public class ProfileServiceTest {
 	@MockBean
     private PhotoService photoService;
 	
+	@MockBean
+	LocationService locationService;
+	
 	Profile profile;
 	
     @Before
@@ -37,7 +41,7 @@ public class ProfileServiceTest {
     	
     	profile = DataUtil.getRandomProfile();
     	
-    	profileService = new ProfileService(profileDao, photoService);
+    	profileService = new ProfileService(profileDao, photoService, locationService);
     	Mockito.when(profileDao.findOne(1L)).thenReturn(profile);
     }
     

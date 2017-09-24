@@ -25,15 +25,16 @@ import com.fasterxml.jackson.annotation.JsonView;
 public class Profile implements Serializable{
 
 	@Id @GeneratedValue
+	@JsonView(View.Public.class)
 	private long id;
 
 	@NotNull(message = "{error.field.required}")
-	@Size(max=256, message="{error.field.size.limit}")
+	@Size(min=2, max=256, message="{error.field.size.limit}")
 	@JsonView(View.Public.class)
 	private String displayName;
 	
 	@NotNull(message = "{error.field.required}")
-	@Size(max=256, message="{error.field.size.limit}")
+	@Size(min=2, max=256, message="{error.field.size.limit}")
 	@JsonView(View.Owner.class)
 	private String realName;
 	
@@ -66,11 +67,11 @@ public class Profile implements Serializable{
 	@JsonView(View.Owner.class)
 	private String maritalStatus;
 	
-	@Size(max=256, message="{error.field.size.limit}")
+	@Size(max=256, message="{error.field.size.maxlimit}")
 	@JsonView(View.Owner.class)
 	private String occupation;
 	
-	@Size(max=5000, message="{error.field.size.limit}")
+	@Size(max=5000, message="{error.field.size.maxlimit}")
 	@JsonView(View.Public.class)
 	private String aboutMe;
 	

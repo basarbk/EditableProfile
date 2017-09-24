@@ -1,29 +1,20 @@
 package com.basarbk.editableprofile.service;
 
-import java.util.List;
-
 import org.springframework.stereotype.Service;
 
-import com.basarbk.editableprofile.domain.GlobalLocations;
-import com.basarbk.editableprofile.domain.dao.GlobalLocationsDao;
-import com.basarbk.editableprofile.exception.LocationNotFoundException;
+import com.basarbk.editableprofile.domain.dao.LocationDao;
 
 @Service
 public class LocationService {
 	
-	GlobalLocationsDao globalLocationsDao;
+	LocationDao locationDao;
 
-	public LocationService(GlobalLocationsDao globalLocationsDao) {
-		this.globalLocationsDao = globalLocationsDao;
+	public LocationService(LocationDao locationDao) {
+		this.locationDao = locationDao;
 	}
 	
-	public List<GlobalLocations> getMatchingLocations(String loc){
-		List<GlobalLocations> locations = globalLocationsDao.findByCityStartingWithIgnoreCase(loc);
-		if(locations== null || locations.size()==0)
-			throw new LocationNotFoundException();
-		return locations;
+	public void deleteLocationOfPartner(long partnerid){
+		locationDao.deleteByProfileId(partnerid);
 	}
-	
-	
 
 }

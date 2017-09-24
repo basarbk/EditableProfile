@@ -2,6 +2,8 @@ package com.basarbk.editableprofile.service;
 
 import java.util.List;
 
+import javax.transaction.Transactional;
+
 import org.springframework.stereotype.Service;
 
 import com.basarbk.editableprofile.domain.Profile;
@@ -15,9 +17,12 @@ public class ProfileService {
 	
 	PhotoService photoService;
 	
-	public ProfileService(ProfileDao profileDao, PhotoService photoService) {
+	LocationService locationService;
+	
+	public ProfileService(ProfileDao profileDao, PhotoService photoService, LocationService locationService) {
 		this.profileDao = profileDao;
 		this.photoService = photoService;
+		this.locationService = locationService;
 	}
 
 	public List<Profile> getProfiles(){
@@ -34,11 +39,13 @@ public class ProfileService {
 		return profile;
 	}
 	
+	@Transactional
 	public Profile updateProfile(long id, Profile profile){
 		if(profile.getProfilePictureFile()!=null) {
 			String path = photoService.savePhoto(profile.getProfilePictureFile());
 			profile.setProfilePicture(path);
 		}
+		locationService.deleteLocationOfPartner(id);
 		profile.setId(id);
 		profile.getLocation().setProfile(profile);
 		profileDao.save(profile);

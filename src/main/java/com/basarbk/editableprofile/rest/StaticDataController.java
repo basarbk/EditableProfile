@@ -10,15 +10,15 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.basarbk.editableprofile.configuration.DataUtil;
-import com.basarbk.editableprofile.service.LocationService;
+import com.basarbk.editableprofile.service.GlobalLocationService;
 
 @RestController
 @RequestMapping("/api")
 public class StaticDataController {
 	
-	LocationService locationService;
+	GlobalLocationService locationService;
 	
-	public StaticDataController(LocationService locationService) {
+	public StaticDataController(GlobalLocationService locationService) {
 		this.locationService = locationService;
 	}
 

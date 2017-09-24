@@ -52,7 +52,8 @@ public class ProfileController {
 	public ResponseEntity<?> getProfile(@PathVariable long id){
 		User user = getLoggedInUser();
 		if(user!=null && user.getProfile() != null && user.getProfile().getId() == id){
-			MappingJacksonValue jsonValue = new MappingJacksonValue(user.getProfile());
+			Profile profile = profileService.getProfile(id);
+			MappingJacksonValue jsonValue = new MappingJacksonValue(profile);
 			jsonValue.setSerializationView(View.Owner.class);
 			return ResponseEntity.ok(jsonValue);
 		}

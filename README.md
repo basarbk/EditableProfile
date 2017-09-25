@@ -13,7 +13,9 @@ Put the `cities.json` to resource folder. It's loaded by spring boot during init
 
 Frontend is implemented with [React](https://facebook.github.io/react/). It is created with facebook's starter kit [Create react app](https://github.com/facebookincubator/create-react-app) . Used [axios](https://github.com/mzabriskie/axios) library for api calls. For UI components I used [Ant Design](https://ant.design/). Frontend codes are under `frontend` folder.
 
-## Build & Run
+User Profile pictures are loaded randomly from http://lorempixel.com . It's not tested how robust and consistent it is.
+
+## Build
 
 This project requires `Java 8` and [maven](http://maven.apache.org/) for building it.
 
@@ -26,12 +28,37 @@ Execute following command to start build process
 mvn package
 ```
 
-jar file to be located under `target` folder
+## Building seperately
+If any failure would be triggering due to maven's npm plugin, build frontend and backend seperately.
+
+
+You'll need to install `npm` which is coming with [nodejs](https://nodejs.org/en/).
+
+To load frontend dependencies
+```
+npm install
+```
+
+Then build with
+```
+npm run build
+```
+
+After frontend build completed, build backend
+```
+mvn package -Pdev
+```
+
+## Running
+
+after build is completed a jar file be generated under `target` folder
 
 application can be started with following command
 ```
 java -jar target\editable-profile-0.0.1-SNAPSHOT.jar
 ```
+
+Open http://localhost:8080 in your browser.
 
 ## Missing parts
 
@@ -55,7 +82,7 @@ The problem can be reproducable by checking out following commit
 
 
 ## Additional
-If you would like to run the application in development mode you'll need to install `npm` which is coming with [nodejs](https://nodejs.org/en/).
+If you would like to run the application in development mode 
 
 To load frontend dependencies
 ```

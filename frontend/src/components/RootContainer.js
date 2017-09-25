@@ -60,6 +60,7 @@ class HomePage extends Component {
                     theme="dark"
                     mode="horizontal"
                     defaultSelectedKeys={[this.state.currentPage]}
+                    selectedKeys={[this.state.currentPage]}
                     style={{ lineHeight: '64px' }}
                     onClick={this.navigate}>
                     <Menu.Item key="1">Profile List</Menu.Item>

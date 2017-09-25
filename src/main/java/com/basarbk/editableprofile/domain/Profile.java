@@ -29,15 +29,15 @@ public class Profile implements Serializable{
 	@JsonView(View.Public.class)
 	private long id;
 
-	@NotNull(message = "{error.field.required}")
-	@Size(min=2, max=256, message="{error.field.size.limit}")
-	@SafeHtml(message="{error.field.safehtml}")
+	@NotNull
+	@Size(min=2, max=256)
+	@SafeHtml
 	@JsonView(View.Public.class)
 	private String displayName;
 	
-	@NotNull(message = "{error.field.required}")
-	@Size(min=2, max=256, message="{error.field.size.limit}")
-	@SafeHtml(message="{error.field.safehtml}")
+	@NotNull
+	@Size(min=2, max=256)
+	@SafeHtml
 	@JsonView(View.Owner.class)
 	private String realName;
 	
@@ -45,12 +45,12 @@ public class Profile implements Serializable{
 	private String profilePicture;
 	
 	@Temporal(TemporalType.DATE)
-	@Past(message = "{error.field.birthday.past}")
-	@NotNull(message = "{error.field.required}")
+	@Past
+	@NotNull
 	@JsonView(View.Public.class)
 	private Date birthday;
 	
-	@NotNull(message = "{error.field.required}")
+	@NotNull
 	@JsonView(View.Public.class)
 	private String gender;
 	
@@ -66,21 +66,21 @@ public class Profile implements Serializable{
 	@JsonView(View.Public.class)
 	private String figure;
 	
-	@NotNull(message = "{error.field.required}")
+	@NotNull
 	@JsonView(View.Owner.class)
 	private String maritalStatus;
 	
-	@Size(max=256, message="{error.field.size.maxlimit}")
-	@SafeHtml(message="{error.field.safehtml}")
+	@Size(max=256)
+	@SafeHtml
 	@JsonView(View.Owner.class)
 	private String occupation;
 	
-	@Size(max=5000, message="{error.field.size.maxlimit}")
-	@SafeHtml(message="{error.field.safehtml}")
+	@Size(max=5000)
+	@SafeHtml
 	@JsonView(View.Public.class)
 	private String aboutMe;
 	
-	@NotNull(message = "{error.field.required}")
+	@NotNull
 	@OneToOne(mappedBy="profile", cascade=CascadeType.ALL)
 	@JsonView(View.Public.class)
 	private Location location;

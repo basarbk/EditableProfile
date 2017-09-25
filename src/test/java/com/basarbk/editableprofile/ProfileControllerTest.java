@@ -208,7 +208,7 @@ public class ProfileControllerTest {
 		assertThat(error.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
 		Map<String, String> errorMap = error.getBody().getErrors();
 		assertThat(errorMap.containsKey("aboutMe")).isTrue();
-		assertThat(errorMap.get("aboutMe")).isEqualTo("Html tags are not allowed");
+		assertThat(errorMap.keySet().size()).isEqualTo(1);
 	}
 	
 	private HttpEntity<String> getRequestEntity(Profile profile) throws JsonProcessingException{

@@ -42,8 +42,7 @@ public class ProfileService {
 	@Transactional
 	public Profile updateProfile(long id, Profile profile){
 		if(profile.getProfilePictureFile()!=null) {
-			String path = photoService.savePhoto(profile.getProfilePictureFile());
-			profile.setProfilePicture(path);
+			photoService.savePhoto(profile.getProfilePictureFile());
 		}
 		Profile inDB = getProfile(id);
 		// since user is not allowed to edit height, making sure here to keep it same

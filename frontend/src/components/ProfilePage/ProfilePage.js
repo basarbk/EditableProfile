@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import * as api from '../../api';
-import { Form, Input, Select, Row, Col, DatePicker, Button, notification } from 'antd';
+import { Form, Input, Select, Row, Col, DatePicker, Button, notification, Tooltip } from 'antd';
 import moment from 'moment';
 import InputLimiter from './InputLimiter';
 
@@ -87,7 +87,7 @@ class ProfilePage extends Component {
     }
 
     onSelectLocation = (event) => {
-        const selectedLoc = this.locations.filter(l => l.city == event);
+        const selectedLoc = this.locations.filter(l => l.city === event);
         if(selectedLoc){
             const myprofile = Object.assign({}, this.state.myprofile);
             myprofile.location = selectedLoc[0];
@@ -169,9 +169,9 @@ class ProfilePage extends Component {
         return (
             <Row>
                 <Col span={8} style={{textAlign:'center'}}>
-                    <img src={this.state.myprofile.profilePicture} />
-                    <br/>
-                    <span>Photo attachment functionality is not implemented</span>
+                <img src={this.state.myprofile.profilePicture} alt="Avatar" />
+                <br/>
+                <span>Photo attachment functionality is not implemented</span>
                 </Col>
                 <Col span={16}>
                     <Form onSubmit={this.handleSubmit}>
@@ -181,7 +181,14 @@ class ProfilePage extends Component {
                                     <Input name="displayName" value={this.state.myprofile.displayName} onChange={this.onInputChange} />
                                 </FormItem>
                                 <FormItem label="Real Name" required validateStatus={this.state.errors.realName && 'error'} help={this.state.errors.realName || ''}>
-                                    <Input name="realName" value={this.state.myprofile.realName} onChange={this.onInputChange} />
+                                    <Tooltip
+                                        trigger={['focus']}
+                                        title={"Your real name won't be displayed to other users"}
+                                        placement="rightBottom"
+                                        overlayClassName="numeric-input"
+                                    >
+                                        <Input name="realName" value={this.state.myprofile.realName} onChange={this.onInputChange} />
+                                    </Tooltip>
                                 </FormItem>
                             </Col>
                         </Row>
@@ -222,11 +229,18 @@ class ProfilePage extends Component {
                         <Row gutter={20}>
                             <Col span={8}>
                                 <FormItem label="Marital Status" required validateStatus={this.state.errors.maritalStatus && 'error'} help={this.state.errors.maritalStatus || ''}>
-                                    <Select value={this.state.myprofile.maritalStatus} placeholder="Select Marital Status" onChange={this.onSelectMaritalStatus}>
-                                        {this.state.static.maritalStatus && this.state.static.maritalStatus.map((maritalStatus, index) =>
-                                            <Option key={index} value={maritalStatus}>{maritalStatus}</Option>
-                                        )}
-                                    </Select>
+                                    <Tooltip
+                                            trigger={['focus']}
+                                            title={"Your status won't be displayed to other users"}
+                                            placement="rightBottom"
+                                            overlayClassName="numeric-input"
+                                        >
+                                        <Select value={this.state.myprofile.maritalStatus} placeholder="Select Marital Status" onChange={this.onSelectMaritalStatus}>
+                                            {this.state.static.maritalStatus && this.state.static.maritalStatus.map((maritalStatus, index) =>
+                                                <Option key={index} value={maritalStatus}>{maritalStatus}</Option>
+                                            )}
+                                        </Select>
+                                    </Tooltip>
                                 </FormItem>
                             </Col>
                             <Col span={8}>
@@ -270,8 +284,15 @@ class ProfilePage extends Component {
                         </Row>
                         <Row gutter={20}>
                             <FormItem label="Occupation" validateStatus={this.state.errors.occupation && 'error'} help={this.state.errors.occupation || ''}>
-                                <TextArea name="occupation" rows={2} value={this.state.myprofile.occupation} onChange={this.onInputChange} />
-                                <InputLimiter limit={256} content={this.state.myprofile.occupation}/>
+                                <Tooltip
+                                    trigger={['focus']}
+                                    title={"Your occupation won't be displayed to other users"}
+                                    placement="bottom"
+                                    overlayClassName="numeric-input"
+                                >
+                                    <TextArea name="occupation" rows={2} value={this.state.myprofile.occupation} onChange={this.onInputChange} />
+                                </Tooltip>
+                                <InputLimiter limit={256} content={this.state.myprofile.occupation} />
                             </FormItem>
                         </Row>
                         <Row gutter={20}>

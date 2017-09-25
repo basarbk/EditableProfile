@@ -5,6 +5,7 @@ class UserDetails extends Component {
         return (
             <div>
                 <h3>Profile of {this.props.profile.displayName} from {this.props.profile.location.city}</h3>
+                <img src={this.props.profile.profilePicture} alt="Avatar" />
                 <table>
                         {Object.keys(this.props.profile).filter(k => k!=='location').map((key, index) => 
                             <tr key={index}>

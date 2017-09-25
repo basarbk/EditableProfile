@@ -15,6 +15,7 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Past;
 import javax.validation.constraints.Size;
 
+import org.hibernate.validator.constraints.SafeHtml;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.basarbk.editableprofile.domain.vm.View;
@@ -30,11 +31,13 @@ public class Profile implements Serializable{
 
 	@NotNull(message = "{error.field.required}")
 	@Size(min=2, max=256, message="{error.field.size.limit}")
+	@SafeHtml(message="{error.field.safehtml}")
 	@JsonView(View.Public.class)
 	private String displayName;
 	
 	@NotNull(message = "{error.field.required}")
 	@Size(min=2, max=256, message="{error.field.size.limit}")
+	@SafeHtml(message="{error.field.safehtml}")
 	@JsonView(View.Owner.class)
 	private String realName;
 	
@@ -68,10 +71,12 @@ public class Profile implements Serializable{
 	private String maritalStatus;
 	
 	@Size(max=256, message="{error.field.size.maxlimit}")
+	@SafeHtml(message="{error.field.safehtml}")
 	@JsonView(View.Owner.class)
 	private String occupation;
 	
 	@Size(max=5000, message="{error.field.size.maxlimit}")
+	@SafeHtml(message="{error.field.safehtml}")
 	@JsonView(View.Public.class)
 	private String aboutMe;
 	

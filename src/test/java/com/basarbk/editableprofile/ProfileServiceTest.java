@@ -67,4 +67,18 @@ public class ProfileServiceTest {
     	List<Profile> profiles = profileService.getProfiles();
     	assertThat(profiles.size()).isEqualTo(1);
     }
+    
+    @Test
+    public void updateHeightProfileNotChanged() throws Exception {
+    	int originalHeight = profile.getHeight();
+    	int differentHeight = originalHeight + 15;    	
+
+    	// this can be considered as copy of profile
+    	Profile profileCopy = DataUtil.getRandomProfile(); 
+
+    	profileCopy.setHeight(differentHeight);
+    	Profile serviceProcessedProfile = profileService.updateProfile(1L, profileCopy);
+    	assertThat(differentHeight).isNotEqualTo(serviceProcessedProfile.getHeight());
+    	assertThat(originalHeight).isEqualTo(serviceProcessedProfile.getHeight());
+    }
 }

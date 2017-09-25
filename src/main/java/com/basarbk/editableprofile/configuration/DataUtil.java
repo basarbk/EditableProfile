@@ -39,7 +39,7 @@ public class DataUtil {
 		Profile profile = new Profile();
 		profile.setDisplayName(getRandomFromArray(displayNames));
 		profile.setRealName(getRandomFromArray(realNames));
-		profile.setProfilePicture("http://placehold.it/256x256");
+		profile.setProfilePicture("http://lorempixel.com/256/256/sports/"+random.nextInt(9));
 		profile.setBirthday(getRandomBirthday());
 		profile.setGender(getRandomFromArray(gender));
 		profile.setEthnicity(getRandomFromArray(ethnicity));

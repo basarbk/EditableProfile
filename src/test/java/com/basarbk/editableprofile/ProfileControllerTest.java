@@ -27,6 +27,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 import com.basarbk.editableprofile.configuration.DataUtil;
 import com.basarbk.editableprofile.domain.Profile;
 import com.basarbk.editableprofile.domain.vm.ValidationError;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 @RunWith(SpringRunner.class)
@@ -149,12 +150,7 @@ public class ProfileControllerTest {
 		
 		testRestTemplate.getRestTemplate().getInterceptors().clear();
 		
-		ObjectMapper mapper = new ObjectMapper();
-		String json = mapper.writeValueAsString(profile);
-		HttpHeaders headers = new HttpHeaders();
-	    headers.setContentType(MediaType.APPLICATION_JSON); 
-		HttpEntity<String> entity = new HttpEntity<String>(json, headers); 
-		ResponseEntity<Object> error = testRestTemplate.exchange("/api/profiles/"+profile.getId(), HttpMethod.PUT, entity, Object.class);
+		ResponseEntity<Object> error = testRestTemplate.exchange("/api/profiles/"+profile.getId(), HttpMethod.PUT, getRequestEntity(profile), Object.class);
 		assertThat(error.getStatusCode()).isEqualTo(HttpStatus.FORBIDDEN);
 	}
 
@@ -166,12 +162,7 @@ public class ProfileControllerTest {
 		Profile remote = selfProfileResponse.getBody();
 		profile.setId(remote.getId());
 		
-		ObjectMapper mapper = new ObjectMapper();
-		String json = mapper.writeValueAsString(profile);
-		HttpHeaders headers = new HttpHeaders();
-	    headers.setContentType(MediaType.APPLICATION_JSON); 
-		HttpEntity<String> entity = new HttpEntity<String>(json, headers); 
-		ResponseEntity<Object> error = testRestTemplate.exchange("/api/profiles/10000", HttpMethod.PUT, entity, Object.class);
+		ResponseEntity<Object> error = testRestTemplate.exchange("/api/profiles/10000", HttpMethod.PUT, getRequestEntity(profile), Object.class);
 		assertThat(error.getStatusCode()).isEqualTo(HttpStatus.FORBIDDEN);
 	}
 	
@@ -183,12 +174,7 @@ public class ProfileControllerTest {
 		Profile remote = selfProfileResponse.getBody();
 		profile.setId(remote.getId());
 		
-		ObjectMapper mapper = new ObjectMapper();
-		String json = mapper.writeValueAsString(profile);
-		HttpHeaders headers = new HttpHeaders();
-	    headers.setContentType(MediaType.APPLICATION_JSON); 
-		HttpEntity<String> entity = new HttpEntity<String>(json, headers); 
-		ResponseEntity<ValidationError> error = testRestTemplate.exchange("/api/profiles/"+profile.getId(), HttpMethod.PUT, entity, ValidationError.class);
+		ResponseEntity<ValidationError> error = testRestTemplate.exchange("/api/profiles/"+profile.getId(), HttpMethod.PUT, getRequestEntity(profile), ValidationError.class);
 		assertThat(error.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
 		Map<String, String> errorMap = error.getBody().getErrors();
 		assertThat(errorMap.containsKey("displayName")).isTrue();
@@ -206,14 +192,31 @@ public class ProfileControllerTest {
 		assertThat(selfProfileResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
 		Profile remote = selfProfileResponse.getBody();
 		profile.setId(remote.getId());
+		 
+		ResponseEntity<Object> response = testRestTemplate.exchange("/api/profiles/"+profile.getId(), HttpMethod.PUT, getRequestEntity(profile), Object.class);
+		assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+	}
+	
+	@Test
+	public void updateProfileXSSValidationSuccess() throws Exception {
+		ResponseEntity<Profile> selfProfileResponse = testRestTemplate.getForEntity("/api/profiles/self", Profile.class);
+		assertThat(selfProfileResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
+		Profile profile = selfProfileResponse.getBody();
+		profile.setAboutMe("<script>alert(hey)</script>");
 		
+		ResponseEntity<ValidationError> error = testRestTemplate.exchange("/api/profiles/"+profile.getId(), HttpMethod.PUT, getRequestEntity(profile), ValidationError.class);
+		assertThat(error.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+		Map<String, String> errorMap = error.getBody().getErrors();
+		assertThat(errorMap.containsKey("aboutMe")).isTrue();
+		assertThat(errorMap.get("aboutMe")).isEqualTo("Html tags are not allowed");
+	}
+	
+	private HttpEntity<String> getRequestEntity(Profile profile) throws JsonProcessingException{
 		ObjectMapper mapper = new ObjectMapper();
 		String json = mapper.writeValueAsString(profile);
 		HttpHeaders headers = new HttpHeaders();
 	    headers.setContentType(MediaType.APPLICATION_JSON); 
-		HttpEntity<String> entity = new HttpEntity<String>(json, headers); 
-		ResponseEntity<Object> response = testRestTemplate.exchange("/api/profiles/"+profile.getId(), HttpMethod.PUT, entity, Object.class);
-		assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+		return new HttpEntity<String>(json, headers); 
 	}
 
 }

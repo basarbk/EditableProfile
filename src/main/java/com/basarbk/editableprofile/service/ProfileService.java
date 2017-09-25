@@ -45,6 +45,9 @@ public class ProfileService {
 			String path = photoService.savePhoto(profile.getProfilePictureFile());
 			profile.setProfilePicture(path);
 		}
+		Profile inDB = getProfile(id);
+		// since user is not allowed to edit height, making sure here to keep it same
+		profile.setHeight(inDB.getHeight());
 		locationService.deleteLocationOfPartner(id);
 		profile.setId(id);
 		profile.getLocation().setProfile(profile);

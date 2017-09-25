@@ -19,34 +19,11 @@ User Profile pictures are loaded randomly from http://lorempixel.com . It's not 
 
 This project requires `Java 8` and [maven](http://maven.apache.org/) for building it.
 
-Frontend javascript codes are build with npm scripts. Maven is taking care of it with [frontend-maven-plugin](https://github.com/eirslett/frontend-maven-plugin)
-
->Frontend inclusive build would take longer time. If you don't care about npm installation and build steps, switch to the branch `frontend-prebuild`.
+Frontend is already build in this branch and added to the folder structure of spring boot project.
 
 Execute following command to start build process
 ```
 mvn package
-```
-
-## Building seperately
-If any failure would be triggering due to maven's npm plugin, build frontend and backend seperately.
-
-
-You'll need to install `npm` which is coming with [nodejs](https://nodejs.org/en/).
-
-To load frontend dependencies
-```
-npm install
-```
-
-Then build with
-```
-npm run build
-```
-
-After frontend build completed, build backend
-```
-mvn package -Pdev
 ```
 
 ## Running
@@ -80,6 +57,7 @@ The problem can be reproducable by checking out following commit
 
  `e130b489083b5dab8aa6ff94739fbe28e054f6b4`
 
+PS: that commit does not containt prebuild frontend codes. It's building javascript also, but you see any failure regarding build process, please see the readme of master branch to check build each part separately
 
 ## Additional
 If you would like to run the application in development mode 
@@ -91,7 +69,7 @@ npm install
 
 run the spring boot with following command
 ```
-mvn spring-boot:run -Pdev
+mvn spring-boot:run
 ```
 
 then run the frontend server

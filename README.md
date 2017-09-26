@@ -2,7 +2,7 @@
 
 Editable Profile is a web application to demonstrate validation and role based json serialization on backend.
 
-Frontend validation is intentionally skipped for fields other than `dispayName`. Other fields are validated in backend. `displayName` is only validated for empty value at frontend. Sanitization and length validations for this field is also done at backend.
+Frontend validation is intentionally skipped for fields other than `displayName`. Other fields are validated in backend. `displayName` is only validated for empty value at frontend. Sanitization and length validations for this field is also done at backend.
 
 
 ## Implementation Details
@@ -49,11 +49,11 @@ Also didn't use redux since there are not many components to share same state.
 
 ## Issue
 
-Added validationmessages.properties file incase i18n would be required for validation error messages. Even those messages are sent succesfully from server when running the app on STS or through `mvn spring-boot:run`, when the app is executed from the build jar file, these messages get lost and only received keys instead of values.
+Added validationmessages.properties file incase i18n would be required for validation error messages. Even those messages are sent successfully from server when running the app on STS or through `mvn spring-boot:run`, when the app is executed from the build jar file, these messages get lost and only received keys instead of values.
 
 e.g. instead of receiving `Must be in between 2 and 256 characters`, I was seeing
-`{error.field.size.limit}` . Couldn't figure out why it's behaving like that. And due to limited tme, I removed my custom error messages from my validation annotations go with the defaults.
-The problem can be reproducable by checking out following commit
+`{error.field.size.limit}` . Couldn't figure out why it's behaving like that. And due to limited time, I removed my custom error messages from my validation annotations go with the defaults.
+The problem can be reproducible by checking out following commit
 
  `e130b489083b5dab8aa6ff94739fbe28e054f6b4`
 
